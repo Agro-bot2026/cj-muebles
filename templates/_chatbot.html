@@ -1,0 +1,67 @@
+<style>
+#cbtn{position:fixed;bottom:20px;right:20px;z-index:200;width:60px;height:60px;border-radius:50%;
+  background:linear-gradient(135deg,#e11d48,#be123c);color:#fff;border:none;font-size:1.6rem;
+  cursor:pointer;box-shadow:0 6px 20px rgba(225,29,72,.45);transition:.25s}
+#cbtn:hover{transform:scale(1.08)}
+#cbox{position:fixed;bottom:20px;right:20px;z-index:201;width:min(92vw,380px);height:min(70vh,540px);
+  background:#fff;border-radius:20px;box-shadow:0 12px 40px rgba(0,0,0,.28);display:none;
+  flex-direction:column;overflow:hidden}
+#cbox.abierto{display:flex}
+.cb-hdr{background:linear-gradient(135deg,#1e1b4b,#312e81);color:#fff;padding:14px 16px;
+  display:flex;align-items:center;gap:10px}
+.cb-hdr .ava{width:38px;height:38px;border-radius:50%;background:#e11d48;display:grid;
+  place-items:center;font-size:1.1rem}
+.cb-hdr .info b{display:block;font-size:.95rem}
+.cb-hdr .info span{font-size:.72rem;opacity:.8}
+.cb-hdr .cerrar{margin-left:auto;background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer}
+.cb-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:#f8fafc}
+.cb-m{max-width:82%;padding:10px 14px;border-radius:16px;font-size:.88rem;line-height:1.45;white-space:pre-wrap}
+.cb-bot{background:#fff;border:1px solid #eef2f7;align-self:flex-start;border-bottom-left-radius:4px}
+.cb-user{background:linear-gradient(135deg,#e11d48,#be123c);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.cb-bot b{color:#1e1b4b}
+.cb-typing{align-self:flex-start;color:#94a3b8;font-size:.82rem;padding:4px 8px}
+.cb-input{display:flex;gap:8px;padding:12px;border-top:1px solid #eef2f7;background:#fff}
+.cb-input input{flex:1;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:12px;
+  font-size:.9rem;font-family:inherit;outline:none}
+.cb-input input:focus{border-color:#e11d48}
+.cb-input button{background:linear-gradient(135deg,#e11d48,#be123c);color:#fff;border:none;
+  border-radius:12px;width:44px;font-size:1.1rem;cursor:pointer}
+.cb-input button:disabled{opacity:.5}
+</style>
+<button id="cbtn" onclick="cbToggle()" aria-label="Abrir chat">💬</button>
+<div id="cbox">
+  <div class="cb-hdr">
+    <div class="ava">🛋️</div>
+    <div class="info"><b>Asistente {{ aj.nombre_negocio }}</b><span>Respondemos al instante</span></div>
+    <button class="cerrar" onclick="cbToggle()">✕</button>
+  </div>
+  <div class="cb-msgs" id="cbMsgs"></div>
+  <div class="cb-input">
+    <input id="cbIn" placeholder="Escribí tu consulta..." onkeydown="if(event.key==='Enter')cbSend()">
+    <button id="cbBtn" onclick="cbSend()">➤</button>
+  </div>
+</div>
+<script>
+let cbHist=[],cbOpen=false;
+function cbToggle(){cbOpen=!cbOpen;document.getElementById('cbox').classList.toggle('abierto',cbOpen);
+  document.getElementById('cbtn').style.display=cbOpen?'none':'block';
+  if(cbOpen&&cbHist.length===0)cbAdd('bot','¡Hola! 👋 Soy el asistente de {{ aj.nombre_negocio }}. ¿Qué mueble estás buscando?');
+  if(cbOpen)setTimeout(()=>document.getElementById('cbIn').focus(),100)}
+function cbFmt(t){return t.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')}
+function cbAdd(rol,txt){const d=document.createElement('div');
+  d.className='cb-m '+(rol==='user'?'cb-user':'cb-bot');
+  d.innerHTML=rol==='user'?txt.replace(/</g,'&lt;'):cbFmt(txt);
+  const m=document.getElementById('cbMsgs');m.appendChild(d);m.scrollTop=m.scrollHeight}
+async function cbSend(){const inp=document.getElementById('cbIn'),btn=document.getElementById('cbBtn');
+  const txt=inp.value.trim();if(!txt)return;
+  cbAdd('user',txt);cbHist.push({rol:'user',texto:txt});inp.value='';btn.disabled=true;
+  const t=document.createElement('div');t.className='cb-typing';t.id='cbTyping';t.textContent='escribiendo...';
+  document.getElementById('cbMsgs').appendChild(t);
+  try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({mensaje:txt,historial:cbHist})});
+    const j=await r.json();document.getElementById('cbTyping')?.remove();
+    cbAdd('bot',j.respuesta);cbHist.push({rol:'assistant',texto:j.respuesta})}
+  catch(e){document.getElementById('cbTyping')?.remove();
+    cbAdd('bot','Uy, no pude responder. Probá de nuevo 🙏')}
+  btn.disabled=false;inp.focus()}
+</script>

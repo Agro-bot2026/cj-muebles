@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0a0a0a">
+<title>{% block titulo %}Panel{% endblock %} — CJ Muebles</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+<header class="hdr">
+  <span class="logo">🪑 CJ Muebles</span>
+  <span class="titulo">{% block seccion %}{% endblock %}</span>
+  <a class="salir" href="/admin/logout">Salir</a>
+</header>
+<main class="contenido">{% block contenido %}{% endblock %}</main>
+<nav class="navi">
+  <a href="/admin" class="{{ 'activo' if nav=='inicio' }}"><span class="ico">🏠</span>Inicio</a>
+  <a href="/admin/productos" class="{{ 'activo' if nav=='productos' }}"><span class="ico">🛋️</span>Productos</a>
+  <a href="/admin/categorias" class="{{ 'activo' if nav=='menu' }}"><span class="ico">📂</span>Menú</a>
+  <a href="/admin/ajustes" class="{{ 'activo' if nav=='ajustes' }}"><span class="ico">⚙️</span>Ajustes</a>
+</nav>
+</body>
+</html>

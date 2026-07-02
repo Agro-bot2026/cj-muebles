@@ -1,0 +1,16 @@
+# Secretos — NUNCA subir
+.env
+
+# Datos con estado — van al backup de Drive, no a git
+muebleria.db
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Logs y temporales
+backup.log
+*.log

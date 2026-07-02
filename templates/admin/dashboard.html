@@ -1,0 +1,13 @@
+{% extends "admin/base.html" %}
+{% block titulo %}Inicio{% endblock %}
+{% block seccion %}Inicio{% endblock %}
+{% block contenido %}
+<h1>Hola 👋</h1>
+<p class="ayuda">Todo lo que cargues acá arma la web automáticamente.</p>
+<div class="tarjetas-num">
+  <a href="/admin/productos"><b>{{ n_prod }}</b><span>Productos</span></a>
+  <a href="/admin/categorias"><b>{{ n_cat }}</b><span>Categorías</span></a>
+  <a href="/admin/productos"><b>{{ n_dest }}</b><span>Destacados</span></a>
+</div>
+<a class="btn" href="/admin/productos">+ Cargar producto</a>
+{% endblock %}

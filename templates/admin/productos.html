@@ -1,0 +1,65 @@
+{% extends "admin/base.html" %}
+{% block titulo %}Productos{% endblock %}
+{% block seccion %}Productos{% endblock %}
+{% block contenido %}
+<h1>🛋️ Productos</h1>
+<p class="ayuda">{{ prods|length }} cargados. Buscá o filtrá con los chips.</p>
+<a class="btn" href="/admin/productos/nuevo" style="margin-bottom:14px">+ Nuevo producto</a>
+<input id="buscar" placeholder="🔍 Buscar producto..." style="margin-bottom:12px" oninput="filtrar()">
+<div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:10px">
+  <button class="chip activo" data-f="todos" onclick="setChip(this)">Todos</button>
+  <button class="chip" data-f="destacado" onclick="setChip(this)">⭐ Destacados</button>
+  <button class="chip" data-f="oferta" onclick="setChip(this)">🔥 Oferta</button>
+  <button class="chip" data-f="oculto" onclick="setChip(this)">🚫 Ocultos</button>
+  <button class="chip" data-f="sinfoto" onclick="setChip(this)">📷 Sin foto</button>
+  {% for c in cats %}<button class="chip" data-f="cat-{{ c.id }}" onclick="setChip(this)">{{ c.nombre }}</button>{% endfor %}
+</div>
+<div id="lista">
+{% for p in prods %}
+<div class="tarjeta prod" data-nombre="{{ p.nombre|lower }}" data-cat="cat-{{ p.categoria_id or 0 }}"
+     data-destacado="{{ p.destacado }}" data-oferta="{{ 1 if p.precio_oferta else 0 }}"
+     data-visible="{{ p.visible }}" data-foto="{{ 1 if p.foto else 0 }}"
+     style="display:flex;gap:12px;align-items:center">
+  {% if p.foto %}<img src="/static/uploads/{{ p.foto }}" style="width:58px;height:58px;object-fit:cover;border-radius:12px">
+  {% else %}<div style="width:58px;height:58px;border-radius:12px;background:var(--elev);display:grid;place-items:center">📷</div>{% endif %}
+  <div style="flex:1;min-width:0">
+    <a href="/admin/productos/{{ p.id }}/editar" style="font-weight:700">{{ p.nombre }}</a>
+    <div style="font-size:.78rem;color:var(--txt2)">{{ p.categoria or "Sin categoría" }} ·
+      {% if p.precio_oferta %}<s>{{ p.precio }}</s> <b style="color:#f87171">{{ p.precio_oferta }}</b>
+      {% else %}{{ p.precio or "Consultar" }}{% endif %}</div>
+    <div style="margin-top:4px">
+      {% if p.destacado %}<span class="pill pill-ok">⭐ destacado</span>{% endif %}
+      {% if p.precio_oferta %}<span class="pill" style="background:rgba(249,115,22,.15);color:#fb923c">🔥 oferta</span>{% endif %}
+      {% if not p.visible %}<span class="pill pill-off">🚫 oculto</span>{% endif %}
+      {% if p.video %}<span class="pill" style="background:rgba(102,126,234,.15);color:#a5b4fc">📹 video</span>{% endif %}
+    </div>
+  </div>
+  <form method="post" action="/admin/productos/{{ p.id }}/borrar"
+        onsubmit="return confirm('¿Borrar {{ p.nombre }} con todas sus fotos?')">
+    <button class="btn btn-rojo" type="submit">🗑</button>
+  </form>
+</div>
+{% else %}
+<div class="tarjeta" style="text-align:center;color:#666">Sin productos todavía. Cargá el primero 👆</div>
+{% endfor %}
+</div>
+<style>
+.chip{padding:8px 14px;border-radius:999px;border:1px solid var(--borde2);background:var(--card);
+  color:var(--txt2);font-family:inherit;font-weight:600;font-size:.8rem;white-space:nowrap;cursor:pointer}
+.chip.activo{background:var(--grad);color:#fff;border-color:transparent}
+</style>
+<script>
+let filtro="todos";
+function setChip(el){document.querySelectorAll('.chip').forEach(c=>c.classList.remove('activo'));
+  el.classList.add('activo');filtro=el.dataset.f;filtrar()}
+function filtrar(){const q=document.getElementById('buscar').value.toLowerCase();
+  document.querySelectorAll('.prod').forEach(p=>{
+    let ok=p.dataset.nombre.includes(q);
+    if(filtro==="destacado")ok=ok&&p.dataset.destacado==="1";
+    else if(filtro==="oferta")ok=ok&&p.dataset.oferta==="1";
+    else if(filtro==="oculto")ok=ok&&p.dataset.visible==="0";
+    else if(filtro==="sinfoto")ok=ok&&p.dataset.foto==="0";
+    else if(filtro.startsWith("cat-"))ok=ok&&p.dataset.cat===filtro;
+    p.style.display=ok?"flex":"none"})}
+</script>
+{% endblock %}

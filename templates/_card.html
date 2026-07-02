@@ -1,0 +1,25 @@
+<a class="card" href="{% if p.whatsapp_link %}{{ p.whatsapp_link }}{% else %}#{% endif %}"
+   data-nombre="{{ p.nombre|lower }}" data-cat="cat-{{ p.categoria_id or 0 }}"
+   {% if not p.whatsapp_link %}onclick="return false"{% else %}target="_blank" rel="noopener"{% endif %}>
+  <div class="card-img">
+    {% if p.foto %}<img src="/static/uploads/{{ p.foto }}" alt="{{ p.nombre }}" loading="lazy">
+    {% elif p.video %}<video src="/static/uploads/{{ p.video }}" muted></video>
+    {% else %}<div class="card-nofoto">🛋️</div>{% endif %}
+    {% if p.precio_oferta %}<span class="badge b-of">🔥 Oferta</span>
+    {% elif p.destacado %}<span class="badge b-dest">⭐ Destacado</span>{% endif %}
+    {% if p.video or p.video_url %}<span class="badge b-vid">📹</span>{% endif %}
+  </div>
+  <div class="card-body">
+    <div class="card-cat">{{ p.categoria or "Mueble" }}</div>
+    <div class="card-nom">{{ p.nombre }}</div>
+    {% if p.descripcion %}<div class="card-desc">{{ p.descripcion }}</div>{% endif %}
+    <div class="card-foot">
+      <div class="precio-row">
+        {% if p.precio_oferta %}<span class="precio">{{ p.precio_oferta }}</span>
+          <span class="precio-viejo">{{ p.precio }}</span>
+        {% else %}<span class="precio">{{ p.precio or "Consultar" }}</span>{% endif %}
+      </div>
+      <div class="card-wsp">💬 Consultar</div>
+    </div>
+  </div>
+</a>

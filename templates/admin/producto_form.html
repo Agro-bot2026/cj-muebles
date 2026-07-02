@@ -1,0 +1,59 @@
+{% extends "admin/base.html" %}
+{% block titulo %}{{ "Editar" if p else "Nuevo" }}{% endblock %}
+{% block seccion %}{{ "Editar producto" if p else "Nuevo producto" }}{% endblock %}
+{% block contenido %}
+<h1>{{ "✏️ " + p.nombre if p else "🛋️ Nuevo producto" }}</h1>
+<form method="post" action="/admin/productos/guardar" enctype="multipart/form-data" class="tarjeta">
+  <input type="hidden" name="pid" value="{{ p.id if p else 0 }}">
+  <label>Nombre</label>
+  <input name="nombre" value="{{ p.nombre if p else '' }}" required>
+  <label>Categoría</label>
+  <select name="categoria_id">
+    <option value="0">— Sin categoría —</option>
+    {% for c in cats %}
+    <option value="{{ c.id }}" {% if p and p.categoria_id==c.id %}selected{% endif %}>{{ c.nombre }}</option>
+    {% endfor %}
+  </select>
+  <label>Descripción</label>
+  <textarea name="descripcion" rows="4">{{ p.descripcion if p else '' }}</textarea>
+  <label>Precio normal (texto libre, ej: $450.000 — vacío = "Consultar")</label>
+  <input name="precio" value="{{ p.precio if p else '' }}">
+  <label>Precio de OFERTA 🔥 (si lo cargás, el normal aparece tachado)</label>
+  <input name="precio_oferta" value="{{ p.precio_oferta if p else '' }}">
+  <label>Orden (menor = primero)</label>
+  <input class="chico" type="number" name="orden" value="{{ p.orden if p else 0 }}">
+  <label class="check" style="margin-top:14px"><input type="checkbox" name="destacado" value="1"
+    {% if p and p.destacado %}checked{% endif %}> ⭐ Destacado en portada</label>
+  <label class="check"><input type="checkbox" name="visible" value="1"
+    {% if not p or p.visible %}checked{% endif %}> 👁 Visible en la web</label>
+  <label>Agregar fotos (JPG/PNG/WebP, máx 8MB c/u, podés elegir varias)</label>
+  <input type="file" name="fotos" accept=".jpg,.jpeg,.png,.webp" multiple>
+  <label>Link de video de Facebook/Instagram (opcional — si no subís archivo)</label>
+  <input name="video_url" value="{{ p.video_url if p else '' }}" placeholder="https://www.facebook.com/...">
+  <label>Video corto (MP4/WebM, máx 40MB — reemplaza el anterior)</label>
+  <input type="file" name="video" accept=".mp4,.webm">
+  <button class="btn" type="submit" style="margin-top:18px;width:100%">💾 Guardar producto</button>
+</form>
+{% if fotos %}
+<h1 style="font-size:1.05rem;margin-top:20px">📷 Fotos cargadas</h1>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+  {% for f in fotos %}
+  <div class="tarjeta" style="text-align:center;padding:10px">
+    <img src="/static/uploads/{{ f.archivo }}" style="width:104px;height:104px;object-fit:cover;border-radius:10px">
+    <form method="post" action="/admin/media/{{ f.id }}/borrar" style="margin-top:8px">
+      <button class="btn btn-rojo" type="submit">Quitar</button>
+    </form>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% if video %}
+<h1 style="font-size:1.05rem;margin-top:20px">📹 Video cargado</h1>
+<div class="tarjeta" style="text-align:center">
+  <video src="/static/uploads/{{ video.archivo }}" controls style="width:100%;max-width:300px;border-radius:10px"></video>
+  <form method="post" action="/admin/media/{{ video.id }}/borrar" style="margin-top:8px">
+    <button class="btn btn-rojo" type="submit">Quitar video</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

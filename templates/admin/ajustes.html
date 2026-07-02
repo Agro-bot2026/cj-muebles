@@ -1,0 +1,47 @@
+{% extends "admin/base.html" %}
+{% block titulo %}Ajustes{% endblock %}
+{% block seccion %}Ajustes{% endblock %}
+{% block contenido %}
+<h1>⚙️ Ajustes del negocio</h1>
+<p class="ayuda">Todo esto se refleja al instante en la web.</p>
+{% if ok==1 %}<div class="exito">✔ Ajustes guardados</div>{% endif %}
+{% if ok==2 %}<div class="error">✘ La clave actual no coincide</div>{% endif %}
+{% if ok==3 %}<div class="exito">✔ Clave cambiada</div>{% endif %}
+<form method="post" action="/admin/ajustes" class="tarjeta">
+  <label>Nombre del negocio</label>
+  <input name="nombre_negocio" value="{{ aj.nombre_negocio }}" required>
+  <label>Eslogan</label>
+  <input name="eslogan" value="{{ aj.eslogan }}">
+  <label>🔥 Barra de promo (arriba de la web — vacío = no se muestra)</label>
+  <input name="promo" value="{{ aj.promo }}" placeholder="Ej: Envío gratis en San Martín">
+  <label>WhatsApp (código país sin +, ej: 5492634000000)</label>
+  <input name="whatsapp" value="{{ aj.whatsapp }}">
+  <label>Teléfono</label>
+  <input name="telefono" value="{{ aj.telefono }}">
+  <label>Dirección del local</label>
+  <input name="direccion" value="{{ aj.direccion }}">
+  <label>Horarios</label>
+  <input name="horarios" value="{{ aj.horarios }}" placeholder="Lun a Sáb 9-13 y 17-21">
+  <label>Instagram (URL)</label>
+  <input name="instagram" value="{{ aj.instagram }}">
+  <label>Facebook (URL)</label>
+  <input name="facebook" value="{{ aj.facebook }}">
+  <label>Email</label>
+  <input name="email" value="{{ aj.email }}" type="email">
+  <label>Telegram (usuario o link t.me)</label>
+  <input name="telegram" value="{{ aj.telegram }}" placeholder="@mueblescj o https://t.me/...">
+  <label>TikTok (URL)</label>
+  <input name="tiktok" value="{{ aj.tiktok }}">
+  <label>Otra web / catálogo (URL)</label>
+  <input name="web" value="{{ aj.web }}">
+  <button class="btn" type="submit" style="margin-top:18px;width:100%">💾 Guardar ajustes</button>
+</form>
+<h1 style="font-size:1.05rem;margin-top:22px">🔒 Cambiar clave</h1>
+<form method="post" action="/admin/clave" class="tarjeta">
+  <label>Clave actual</label>
+  <input type="password" name="actual" required>
+  <label>Clave nueva (mín. 8)</label>
+  <input type="password" name="nueva" required minlength="8">
+  <button class="btn" type="submit" style="margin-top:14px;width:100%">Cambiar clave</button>
+</form>
+{% endblock %}

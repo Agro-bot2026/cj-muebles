@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1e1b4b">
+<title>{{ aj.nombre_negocio }}</title>
+<meta name="description" content="{{ aj.eslogan }}">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="muebles, mueblería, {{ aj.nombre_negocio }}, sofás, dormitorios, comedores, living, San Martín, Mendoza">
+<link rel="canonical" href="https://cj-muebles.charly-tricks.dev/">
+<meta name="author" content="{{ aj.nombre_negocio }}">
+<meta name="language" content="es">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" href="/static/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/static/img/apple-touch-icon.png">
+<link rel="manifest" href="/static/manifest.json">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{ aj.nombre_negocio }}">
+<meta property="og:description" content="{{ aj.eslogan }}">
+<meta property="og:image" content="https://cj-muebles.charly-tricks.dev/static/img/og-image.png">
+<meta property="og:url" content="https://cj-muebles.charly-tricks.dev">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="/static/css/tienda.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FurnitureStore",
+"name":"{{ aj.nombre_negocio }}","telephone":"{{ aj.telefono }}","address":"{{ aj.direccion }}"}
+</script>
+</head>
+<body>
+{% if aj.promo %}<div class="promo">{{ aj.promo }}</div>{% endif %}
+<header>
+  <div class="hdr-top">
+    <div class="logo"><span class="logo-ic">🛋️</span>{{ aj.nombre_negocio }}</div>
+    {% if aj.whatsapp %}<a class="wsp-top" href="https://wa.me/{{ aj.whatsapp }}" target="_blank" rel="noopener">💬 Consultar</a>{% endif %}
+  </div>
+  <div class="buscador">
+    <span class="ic">🔍</span>
+    <input id="q" placeholder="Buscar muebles..." oninput="filtrar()">
+  </div>
+</header>
+<nav id="nav">
+  <button class="cat activo" data-c="todos" onclick="setCat(this)">Todos</button>
+  {% for c in menu %}<button class="cat" data-c="cat-{{ c.id }}" onclick="setCat(this)">{{ c.nombre }}</button>{% endfor %}
+</nav>
+<main class="main">
+  {% if destacados %}
+  <h2 class="sec-tit" id="tit-dest">⭐ Destacados</h2>
+  <div class="grid" id="grid-dest">
+    {% for p in destacados %}{% include "_card.html" %}{% endfor %}
+  </div>
+  {% endif %}
+  <h2 class="sec-tit">🛋️ Catálogo</h2>
+  <div class="grid" id="grid">
+    {% for p in productos %}{% include "_card.html" %}{% endfor %}
+    <div class="vacio" id="vacio" style="display:none">No encontramos muebles con esa búsqueda.</div>
+  </div>
+  {% if not productos %}<div class="vacio">Muy pronto vas a ver el catálogo acá 🪑</div>{% endif %}
+</main>
+<footer>
+  © 2026 {{ aj.nombre_negocio }}<br>
+  {% if aj.direccion %}📍 {{ aj.direccion }}<br>{% endif %}
+  {% if aj.horarios %}🕐 {{ aj.horarios }}<br>{% endif %}
+  {% if aj.telefono %}<a href="tel:{{ aj.telefono }}">📞 {{ aj.telefono }}</a>{% endif %}
+  {% if aj.instagram %} · <a href="{{ aj.instagram }}" target="_blank" rel="noopener">Instagram</a>{% endif %}
+  {% if aj.facebook %} · <a href="{{ aj.facebook }}" target="_blank" rel="noopener">Facebook</a>{% endif %}
+  {% if aj.telegram %} · <a href="{{ aj.telegram if 'http' in aj.telegram else 'https://t.me/' + aj.telegram.lstrip('@') }}" target="_blank" rel="noopener">Telegram</a>{% endif %}
+  {% if aj.tiktok %} · <a href="{{ aj.tiktok }}" target="_blank" rel="noopener">TikTok</a>{% endif %}
+  {% if aj.email %}<br><a href="mailto:{{ aj.email }}">✉️ {{ aj.email }}</a>{% endif %}
+  {% if aj.web %} · <a href="{{ aj.web }}" target="_blank" rel="noopener">🌐 Sitio</a>{% endif %}
+</footer>
+<script>
+let cat="todos";
+function setCat(el){document.querySelectorAll('.cat').forEach(c=>c.classList.remove('activo'));
+  el.classList.add('activo');cat=el.dataset.c;filtrar()}
+function filtrar(){const q=document.getElementById('q').value.toLowerCase();
+  const dest=document.getElementById('grid-dest');
+  if(dest)dest.parentElement&&(document.getElementById('tit-dest').style.display=(q||cat!=="todos")?"none":"flex",dest.style.display=(q||cat!=="todos")?"none":"grid");
+  let vis=0;
+  document.querySelectorAll('#grid .card').forEach(c=>{
+    let ok=c.dataset.nombre.includes(q);
+    if(cat!=="todos")ok=ok&&c.dataset.cat===cat;
+    c.style.display=ok?"flex":"none";if(ok)vis++});
+  document.getElementById('vacio').style.display=vis?"none":"block"}
+</script>
+{% include "_chatbot.html" %}
+</body>
+</html>
